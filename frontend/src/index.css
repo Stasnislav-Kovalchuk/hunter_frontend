@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Simple “Apple-ish” defaults */
+:root {
+  color-scheme: light;
+}
+

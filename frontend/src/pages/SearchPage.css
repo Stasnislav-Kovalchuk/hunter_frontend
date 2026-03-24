@@ -1,0 +1,83 @@
+.search-page {
+  background: #fff;
+  min-height: 100vh;
+  padding: 15px 20px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.search-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.back-btn {
+  background: none;
+  border: 1px solid #000000;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.search-input-wrapper {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input-wrapper input {
+  width: 100%;
+  padding: 12px 15px 12px 45px;
+  border: 1px solid #ff4d4d;
+  border-radius: 30px;
+  font-size: 1rem;
+  outline: none;
+  height: 35px;
+  color: #4A4A4A;
+}
+
+.inner-search-icon {
+  position: absolute;
+  left: 10px;
+  width: 22px;
+}
+
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-top: 80px;
+}
+
+.img-404 {
+  width: 180px;
+}
+
+.no-results p {
+  font-weight: 500;
+  color: #000;
+}
+
+.search-placeholder-text {
+  text-align: center;
+  color: #4A4A4A;
+  margin-top: 30px;
+}
+
+/* Перевикористання твоїх стилів карток */
+.search-card {
+  margin-bottom: 10px;
+}
+
+.search-card:last-child{
+    border-bottom: none;
+}

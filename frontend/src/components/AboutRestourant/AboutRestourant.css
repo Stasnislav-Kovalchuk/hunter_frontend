@@ -1,0 +1,21 @@
+.about-section {
+  width: 90%;
+  margin: 30px auto;
+  text-align: left;
+}
+
+.about-section h2 {
+  font-size: 1rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+
+}
+
+.about-section p {
+  color: #666;
+  line-height: 1.5;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: 'Space Grotesk', sans-serif;
+}

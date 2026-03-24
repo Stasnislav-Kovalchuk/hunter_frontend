@@ -1,0 +1,212 @@
+.category-page {
+  background-color: #fff;
+  min-height: 100vh;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.category-top-nav {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
+}
+
+.nav-icon-img {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  border: 0.5px solid #000000;
+  object-fit: contain;
+}
+
+.nav-search-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.nav-search-btn {
+  width: 35px;
+  height: 35px;
+  background: none;
+  border: 1px solid #000000;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+.main-selector-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 5px 0 0 0;
+  position: relative;
+  z-index: 200;
+}
+
+/* Контейнер, який тримає спільну тінь для всієї конструкції */
+.custom-dropdown {
+  width: 85%;
+  position: relative;
+  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+}
+
+/* Верхня частина (кнопка) */
+.dropdown-selected-box {
+  background: #ffffff;
+  padding: 12px 20px;
+  /* Робимо ідентичний шрифт і розмір */
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  position: relative;
+  z-index: 301;
+  transition: border-radius 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  
+  /* Початковий стан — овал */
+  border-radius: 50px;
+}
+
+/* Коли відкрито — "з'єднуємо" з низом через зміну радіусів */
+.dropdown-selected-box.open {
+  border-radius: 25px 25px 0 0;
+}
+
+/* Список, що прилягає впритул */
+.dropdown-list {
+  position: absolute;
+  top: 100%; /* Чітко під кнопкою */
+  left: 0;
+  width: 100%;
+  background: #ffffff;
+  /* Скруглюємо тільки низ */
+  border-radius: 0 0 25px 25px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 300;
+  animation: slideDownCustom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: none; /* Тінь іде від батька через filter */
+}
+
+/* Пункти меню */
+.dropdown-option {
+  padding: 14px 20px;
+  text-decoration: none;
+  color: black;
+  /* Той самий шрифт і розмір */
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 800;
+  font-size: 1rem;
+  
+  background: #ffffff;
+  transition: background 0.2s ease;
+  /* Розділювач */
+  border-top: 1px solid #f2f2f2;
+}
+
+.dropdown-option:active {
+  background: #f9f9f9;
+}
+
+/* Плавна поява */
+@keyframes slideDownCustom {
+  from { 
+    opacity: 0; 
+    transform: translateY(-10px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.subcategory-carousel {
+  display: flex;
+  overflow-x: auto;
+  padding: 20px 20px 20px 20px;
+  gap: 12px;
+  position: sticky;
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  z-index: 100;
+  scrollbar-width: none;
+}
+
+.subcategory-carousel::-webkit-scrollbar { display: none; }
+
+.carousel-tab {
+  flex: 0 0 auto;
+  padding: 10px 22px;
+  border-radius: 25px;
+  background: #ffffff;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+  font-weight: 800;
+  font-size: 0.9rem;
+  transition: 0.2s;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.carousel-tab.active {
+  border-color: #e31e24;
+  background: #fff;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+
+.subcategory-section {
+  scroll-margin-top: 80px;
+  padding: 10px 20px;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0 0 15px 0;
+  color: #000;
+}
+
+.dish-item-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 0;
+  border-bottom: 1px solid #B7B7B7;
+  gap: 15px;
+}
+
+.dish-text { flex: 1; }
+.dish-name { font-size: 0.95rem; margin: 0; font-weight: 700; }
+.dish-price { font-weight: bold; margin: 4px 0; }
+.dish-description { font-size: 0.75rem; color: #565656; line-height: 1.3; font-weight: 500; margin: 10px 0px 0px 0px;}
+.dish-meta { font-size: 0.75rem; color: #565656; font-weight: 500;}
+
+.dish-img-box {
+  width: 100px;
+  height: 75px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.placeholder-img { color: #ddd; font-size: 0.7rem; text-transform: uppercase; }
+.subcategory-section .dish-item-card:last-child {
+  border-bottom: none;
+}
+/* Global Smooth Scroll */
+html {
+  scroll-behavior: smooth;
+}
