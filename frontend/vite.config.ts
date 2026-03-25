@@ -15,7 +15,8 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5173,
-      strictPort: true,
+      // Якщо 5173 зайнятий (інший dev-сервер), Vite підбере наступний вільний порт
+      strictPort: false,
       proxy: {
         '/api': {
           target,

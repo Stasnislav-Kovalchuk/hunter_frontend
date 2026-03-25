@@ -1,0 +1,10 @@
+{
+  "name": "hunter_frontend",
+  "private": true,
+  "scripts": {
+    "dev": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix frontend",
+    "preview": "npm run preview --prefix frontend",
+    "check:api": "npm run check:api --prefix frontend"
+  }
+}
