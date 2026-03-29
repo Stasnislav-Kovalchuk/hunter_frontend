@@ -24,26 +24,38 @@ function CategoryPage() {
   const [data, setData] = useState(null)
   const [allCategories, setAllCategories] = useState([])
   const [loading, setLoading] = useState(true)
+  const [refreshing, setRefreshing] = useState(false)
   const [loadError, setLoadError] = useState(null)
 
   const [activeSub, setActiveSub] = useState(0)
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedDish, setSelectedDish] = useState(null)
   const sectionRefs = useRef([])
+  /** Після першого успішного завантаження — переключення категорій без повноекранного лоадера */
+  const hasLoadedOnceRef = useRef(false)
 
   useEffect(() => {
     const id = Number(categoryId)
     if (!Number.isFinite(id) || id < 1) {
       setLoading(false)
+      setRefreshing(false)
       setData(null)
       setLoadError('Некоректна категорія')
       return
     }
 
     let mounted = true
+    const isFirstPaint = !hasLoadedOnceRef.current
+
     ;(async () => {
-      setLoading(true)
       setLoadError(null)
+      if (isFirstPaint) {
+        setLoading(true)
+        setRefreshing(false)
+      } else {
+        setRefreshing(true)
+      }
+
       try {
         const [categories, items] = await Promise.all([
           publicApi.getPublicCategories(),
@@ -58,12 +70,21 @@ function CategoryPage() {
         }
         setAllCategories(categories)
         setData(buildViewModel(cat, items))
+        hasLoadedOnceRef.current = true
+        requestAnimationFrame(() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        })
       } catch (e) {
         if (!mounted) return
-        setData(null)
+        if (isFirstPaint) {
+          setData(null)
+        }
         setLoadError(getErrorMessage(e))
       } finally {
-        if (mounted) setLoading(false)
+        if (mounted) {
+          setLoading(false)
+          setRefreshing(false)
+        }
       }
     })()
 
@@ -76,7 +97,6 @@ function CategoryPage() {
     setSelectedDish(null)
     setIsDropdownOpen(false)
     setActiveSub(0)
-    window.scrollTo(0, 0)
   }, [categoryId])
 
   useEffect(() => {
@@ -131,20 +151,50 @@ function CategoryPage() {
     }
   }, [selectedDish])
 
-  if (loading) {
+  if (loading && !data) {
     return (
-      <div className="category-page">
-        <div className="error-msg" style={{ padding: '2rem' }}>
-          Завантажуємо меню…
+      <div className="category-page category-page--initial">
+        <header className="category-top-nav">
+          <Link to="/">
+            <img src={logo} alt="Logo" className="nav-icon-img" />
+          </Link>
+          <Link to="/search">
+            <button type="button" className="nav-search-btn">
+              <img src={search} alt="Search" className="nav-search-icon" />
+            </button>
+          </Link>
+        </header>
+        <div className="category-skeleton" aria-busy="true" aria-label="Завантаження меню">
+          <div className="category-skeleton__title" />
+          <div className="category-skeleton__line" />
+          <div className="category-skeleton__line category-skeleton__line--short" />
+          {[1, 2, 3].map((k) => (
+            <div key={k} className="category-skeleton__card">
+              <div className="category-skeleton__card-text">
+                <div className="category-skeleton__line" />
+                <div className="category-skeleton__line category-skeleton__line--short" />
+              </div>
+              <div className="category-skeleton__thumb" />
+            </div>
+          ))}
         </div>
       </div>
     )
   }
 
-  if (loadError || !data) {
+  if (!data && loadError) {
     return (
       <div className="category-page">
-        <div className="error-msg">{loadError || 'Категорію не знайдено'}</div>
+        <div className="error-msg">{loadError}</div>
+        <Link to="/">На головну</Link>
+      </div>
+    )
+  }
+
+  if (!data) {
+    return (
+      <div className="category-page">
+        <div className="error-msg">Категорію не знайдено</div>
         <Link to="/">На головну</Link>
       </div>
     )
@@ -156,7 +206,15 @@ function CategoryPage() {
   }
 
   return (
-    <div className="category-page">
+    <div className={`category-page ${refreshing ? 'category-page--refreshing' : ''}`}>
+      <div className="category-refresh-bar" aria-hidden={!refreshing} data-active={refreshing} />
+
+      {loadError ? (
+        <div className="category-inline-error" role="alert">
+          {loadError}
+        </div>
+      ) : null}
+
       <header className="category-top-nav">
         <Link to="/">
           <img src={logo} alt="Logo" className="nav-icon-img" />
@@ -228,7 +286,10 @@ function CategoryPage() {
         ))}
       </div>
 
-      <main className="all-dishes-list">
+      <main
+        className={`all-dishes-list category-dishes-enter ${refreshing ? 'all-dishes-list--dimmed' : ''}`}
+        key={categoryId}
+      >
         {data.subcategories.map((sub, subIndex) => (
           <section
             key={sub.name}
@@ -243,10 +304,11 @@ function CategoryPage() {
                 У цій категорії поки немає доступних страв
               </p>
             ) : null}
-            {sub.items.map((item) => (
+            {sub.items.map((item, itemIndex) => (
               <div
                 key={item.id}
                 className="dish-item-card"
+                style={{ '--stagger': `${Math.min(itemIndex, 12)}` }}
                 onClick={() => setSelectedDish(item)}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
