@@ -165,7 +165,6 @@
   backdrop-filter: blur(10px);
   z-index: 100;
   scrollbar-width: none;
-  display: none;
 }
 
 .subcategory-carousel::-webkit-scrollbar { display: none; }
