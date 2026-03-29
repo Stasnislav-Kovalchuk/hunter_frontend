@@ -7,3 +7,17 @@
   color-scheme: light;
 }
 
+/* На широкому екрані — вузька «колонка як на телефоні» по центру */
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-zinc-200;
+}
+
+#root {
+  @apply mx-auto w-full max-w-[430px] min-h-dvh bg-zinc-50 text-zinc-900 antialiased shadow-2xl;
+}
+
