@@ -59,6 +59,7 @@ function CategoryPage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [selectedDish, setSelectedDish] = useState(null)
   const sectionRefs = useRef([])
+  const carouselRef = useRef(null)
   /** Після першого успішного завантаження — переключення категорій без повноекранного лоадера */
   const hasLoadedOnceRef = useRef(false)
 
@@ -157,6 +158,16 @@ function CategoryPage() {
     setIsDropdownOpen(false)
     setActiveSub(0)
   }, [categoryId])
+
+  useEffect(() => {
+    const root = carouselRef.current
+    if (!root) return
+    const tabs = root.querySelectorAll('.carousel-tab')
+    const el = tabs[activeSub]
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' })
+    }
+  }, [activeSub, data?.subcategories?.length, categoryId])
 
   useEffect(() => {
     if (!data) return
@@ -341,18 +352,27 @@ function CategoryPage() {
         </div>
       </div>
 
-      <div className="subcategory-carousel">
-        {data.subcategories.map((sub, index) => (
-          <button
-            key={sub.id}
-            type="button"
-            className={`carousel-tab ${activeSub === index ? 'active' : ''}`}
-            onClick={() => scrollToSection(index)}
-          >
-            {sub.name}
-          </button>
-        ))}
-      </div>
+      {data.subcategories.length > 1 ? (
+        <div
+          className="subcategory-carousel"
+          ref={carouselRef}
+          role="tablist"
+          aria-label="Підкатегорії"
+        >
+          {data.subcategories.map((sub, index) => (
+            <button
+              key={sub.id}
+              type="button"
+              role="tab"
+              aria-selected={activeSub === index}
+              className={`carousel-tab ${activeSub === index ? 'active' : ''}`}
+              onClick={() => scrollToSection(index)}
+            >
+              {sub.name}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       <main
         className={`all-dishes-list category-dishes-enter ${refreshing ? 'all-dishes-list--dimmed' : ''}`}
