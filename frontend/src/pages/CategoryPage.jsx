@@ -199,7 +199,7 @@ function CategoryPage() {
       },
       {
         threshold: 0,
-        rootMargin: '-200px 0px -40% 0px',
+        rootMargin: '-135px 0px -40% 0px',
       },
     )
 
@@ -224,18 +224,16 @@ function CategoryPage() {
   if (loading && !data) {
     return (
       <div className="category-page category-page--initial">
-        <div className="category-sticky-header category-sticky-header--nav-only">
-          <header className="category-top-nav">
-            <Link to="/">
-              <img src={logo} alt="Logo" className="nav-icon-img" />
-            </Link>
-            <Link to="/search">
-              <button type="button" className="nav-search-btn">
-                <img src={search} alt="Search" className="nav-search-icon" />
-              </button>
-            </Link>
-          </header>
-        </div>
+        <header className="category-top-nav">
+          <Link to="/">
+            <img src={logo} alt="Logo" className="nav-icon-img" />
+          </Link>
+          <Link to="/search">
+            <button type="button" className="nav-search-btn">
+              <img src={search} alt="Search" className="nav-search-icon" />
+            </button>
+          </Link>
+        </header>
         <div className="category-skeleton" aria-busy="true" aria-label="Завантаження меню">
           <div className="category-skeleton__title" />
           <div className="category-skeleton__line" />
@@ -287,18 +285,18 @@ function CategoryPage() {
         </div>
       ) : null}
 
-      <div className="category-sticky-header">
-        <header className="category-top-nav">
-          <Link to="/">
-            <img src={logo} alt="Logo" className="nav-icon-img" />
-          </Link>
-          <Link to="/search">
-            <button type="button" className="nav-search-btn">
-              <img src={search} alt="Search" className="nav-search-icon" />
-            </button>
-          </Link>
-        </header>
+      <header className="category-top-nav">
+        <Link to="/">
+          <img src={logo} alt="Logo" className="nav-icon-img" />
+        </Link>
+        <Link to="/search">
+          <button type="button" className="nav-search-btn">
+            <img src={search} alt="Search" className="nav-search-icon" />
+          </button>
+        </Link>
+      </header>
 
+      <div className="category-sticky-header">
         <div className="main-selector-container">
           <div className="custom-dropdown">
             <div

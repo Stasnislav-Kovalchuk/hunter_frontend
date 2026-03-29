@@ -4,25 +4,22 @@
   font-family: 'Space Grotesk', sans-serif;
 }
 
-/* Шапка + вибір розділу + підкатегорії — один закріплений блок при скролі */
+/* Лише вибір розділу + підкатегорії — закріплені при скролі (лого скролиться разом з контентом) */
 .category-sticky-header {
   position: sticky;
-  top: 0;
+  /* Під виріз екрана, коли шапка вже проскролена */
+  top: env(safe-area-inset-top, 0);
   z-index: 400;
   background: #fff;
-  padding-top: env(safe-area-inset-top, 0);
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
   box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
-}
-
-.category-sticky-header--nav-only {
-  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
 }
 
 .category-top-nav {
   display: flex;
   justify-content: space-between;
   padding: 15px 20px;
+  padding-top: calc(15px + env(safe-area-inset-top, 0));
 }
 
 .nav-icon-img {
@@ -178,11 +175,11 @@
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
   gap: 10px;
-  padding: 10px 16px 14px;
-  margin: 0;
+  padding: 10px 15px 16px 50px;
+  margin: 0px 0px 0px 20px;
   background: #fff;
   scrollbar-width: thin;
-  scrollbar-color: rgba(15, 23, 42, 0.2) transparent;
+  scrollbar-color: rgba(15, 23, 42, .2) transparent;
 }
 
 .subcategory-carousel::-webkit-scrollbar {
@@ -245,8 +242,8 @@
 
 
 .subcategory-section {
-  /* Під повний закріплений верх (нав + дропдаун + ряд табів) */
-  scroll-margin-top: 200px;
+  /* Під закріплений дропдаун + ряд підкатегорій */
+  scroll-margin-top: 135px;
   padding: 20px 20px;
 }
 
