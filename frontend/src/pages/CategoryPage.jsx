@@ -199,7 +199,7 @@ function CategoryPage() {
       },
       {
         threshold: 0,
-        rootMargin: '-130px 0px -40% 0px',
+        rootMargin: '-200px 0px -40% 0px',
       },
     )
 
@@ -224,16 +224,18 @@ function CategoryPage() {
   if (loading && !data) {
     return (
       <div className="category-page category-page--initial">
-        <header className="category-top-nav">
-          <Link to="/">
-            <img src={logo} alt="Logo" className="nav-icon-img" />
-          </Link>
-          <Link to="/search">
-            <button type="button" className="nav-search-btn">
-              <img src={search} alt="Search" className="nav-search-icon" />
-            </button>
-          </Link>
-        </header>
+        <div className="category-sticky-header category-sticky-header--nav-only">
+          <header className="category-top-nav">
+            <Link to="/">
+              <img src={logo} alt="Logo" className="nav-icon-img" />
+            </Link>
+            <Link to="/search">
+              <button type="button" className="nav-search-btn">
+                <img src={search} alt="Search" className="nav-search-icon" />
+              </button>
+            </Link>
+          </header>
+        </div>
         <div className="category-skeleton" aria-busy="true" aria-label="Завантаження меню">
           <div className="category-skeleton__title" />
           <div className="category-skeleton__line" />
@@ -285,94 +287,96 @@ function CategoryPage() {
         </div>
       ) : null}
 
-      <header className="category-top-nav">
-        <Link to="/">
-          <img src={logo} alt="Logo" className="nav-icon-img" />
-        </Link>
-        <Link to="/search">
-          <button type="button" className="nav-search-btn">
-            <img src={search} alt="Search" className="nav-search-icon" />
-          </button>
-        </Link>
-      </header>
+      <div className="category-sticky-header">
+        <header className="category-top-nav">
+          <Link to="/">
+            <img src={logo} alt="Logo" className="nav-icon-img" />
+          </Link>
+          <Link to="/search">
+            <button type="button" className="nav-search-btn">
+              <img src={search} alt="Search" className="nav-search-icon" />
+            </button>
+          </Link>
+        </header>
 
-      <div className="main-selector-container">
-        <div className="custom-dropdown">
-          <div
-            className={`dropdown-selected-box ${isDropdownOpen ? 'open' : ''}`}
-            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault()
-                setIsDropdownOpen(!isDropdownOpen)
-              }
-            }}
-            role="button"
-            tabIndex={0}
-          >
-            <span className="dropdown-label">{data.title}</span>
-            <svg
-              className={`arrow-icon ${isDropdownOpen ? 'rotate' : ''}`}
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="black"
-              strokeWidth="3"
+        <div className="main-selector-container">
+          <div className="custom-dropdown">
+            <div
+              className={`dropdown-selected-box ${isDropdownOpen ? 'open' : ''}`}
+              onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  setIsDropdownOpen(!isDropdownOpen)
+                }
+              }}
+              role="button"
+              tabIndex={0}
             >
-              <polyline points="6 9 12 15 18 9" />
-            </svg>
-          </div>
+              <span className="dropdown-label">{data.title}</span>
+              <svg
+                className={`arrow-icon ${isDropdownOpen ? 'rotate' : ''}`}
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="black"
+                strokeWidth="3"
+              >
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </div>
 
-          {isDropdownOpen ? (
-            <div className="dropdown-list">
-              {viewKind === 'sub' && resolvedSectionId != null ? (
-                <Link
-                  to={`/category/${resolvedSectionId}`}
-                  className="dropdown-option dropdown-option--emphasis"
-                  onClick={() => setIsDropdownOpen(false)}
-                >
-                  Увесь розділ
-                </Link>
-              ) : null}
-              {navRoots
-                .filter((r) => r.id !== resolvedSectionId)
-                .map((r) => (
+            {isDropdownOpen ? (
+              <div className="dropdown-list">
+                {viewKind === 'sub' && resolvedSectionId != null ? (
                   <Link
-                    key={r.id}
-                    to={`/category/${r.id}`}
-                    className="dropdown-option"
+                    to={`/category/${resolvedSectionId}`}
+                    className="dropdown-option dropdown-option--emphasis"
                     onClick={() => setIsDropdownOpen(false)}
                   >
-                    {r.name}
+                    Увесь розділ
                   </Link>
-                ))}
-            </div>
-          ) : null}
+                ) : null}
+                {navRoots
+                  .filter((r) => r.id !== resolvedSectionId)
+                  .map((r) => (
+                    <Link
+                      key={r.id}
+                      to={`/category/${r.id}`}
+                      className="dropdown-option"
+                      onClick={() => setIsDropdownOpen(false)}
+                    >
+                      {r.name}
+                    </Link>
+                  ))}
+              </div>
+            ) : null}
+          </div>
         </div>
-      </div>
 
-      {data.subcategories.length > 1 ? (
-        <div
-          className="subcategory-carousel"
-          ref={carouselRef}
-          role="tablist"
-          aria-label="Підкатегорії"
-        >
-          {data.subcategories.map((sub, index) => (
-            <button
-              key={sub.id}
-              type="button"
-              role="tab"
-              aria-selected={activeSub === index}
-              className={`carousel-tab ${activeSub === index ? 'active' : ''}`}
-              onClick={() => scrollToSection(index)}
-            >
-              {sub.name}
-            </button>
-          ))}
-        </div>
-      ) : null}
+        {data.subcategories.length > 1 ? (
+          <div
+            className="subcategory-carousel"
+            ref={carouselRef}
+            role="tablist"
+            aria-label="Підкатегорії"
+          >
+            {data.subcategories.map((sub, index) => (
+              <button
+                key={sub.id}
+                type="button"
+                role="tab"
+                aria-selected={activeSub === index}
+                className={`carousel-tab ${activeSub === index ? 'active' : ''}`}
+                onClick={() => scrollToSection(index)}
+              >
+                {sub.name}
+              </button>
+            ))}
+          </div>
+        ) : null}
+      </div>
 
       <main
         className={`all-dishes-list category-dishes-enter ${refreshing ? 'all-dishes-list--dimmed' : ''}`}

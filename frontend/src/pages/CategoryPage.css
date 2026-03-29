@@ -4,6 +4,21 @@
   font-family: 'Space Grotesk', sans-serif;
 }
 
+/* Шапка + вибір розділу + підкатегорії — один закріплений блок при скролі */
+.category-sticky-header {
+  position: sticky;
+  top: 0;
+  z-index: 400;
+  background: #fff;
+  padding-top: env(safe-area-inset-top, 0);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
+}
+
+.category-sticky-header--nav-only {
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
 .category-top-nav {
   display: flex;
   justify-content: space-between;
@@ -34,6 +49,7 @@
   justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  display: none;
 }
 
 
@@ -162,14 +178,9 @@
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
   gap: 10px;
-  padding: 14px 16px 16px;
-  margin: 0 0 4px;
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 100%);
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 10px 16px 14px;
+  margin: 0;
+  background: #fff;
   scrollbar-width: thin;
   scrollbar-color: rgba(15, 23, 42, 0.2) transparent;
 }
@@ -234,7 +245,8 @@
 
 
 .subcategory-section {
-  scroll-margin-top: 100px;
+  /* Під повний закріплений верх (нав + дропдаун + ряд табів) */
+  scroll-margin-top: 200px;
   padding: 20px 20px;
 }
 
