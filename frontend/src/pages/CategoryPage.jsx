@@ -10,19 +10,47 @@ import search from '../images/search.png'
 import './CategoryPage.css'
 import '../css/dishmodal.css'
 import AboutRestourant from '../components/AboutRestourant/AboutRestourant.jsx'
+import {
+  buildContextFromFlat,
+  findCategoryContext,
+  rootsFromFlat,
+  sortRoots,
+} from '@/utils/categoryTree'
 
 function buildViewModel(category, items) {
   const cards = items.map(menuItemToLegacyCard)
   return {
     title: category.name,
-    subcategories: [{ name: 'Усі страви', items: cards }],
+    subcategories: [{ id: category.id, name: 'Усі страви', items: cards }],
+  }
+}
+
+/** Розділ: товари по всьому дереву; групуємо по підкатегоріях */
+function buildSectionViewModel(section, items) {
+  const children = section.children || []
+  if (children.length === 0) {
+    return {
+      title: section.name,
+      subcategories: [{ id: `all-${section.id}`, name: 'Усі страви', items: items.map(menuItemToLegacyCard) }],
+    }
+  }
+  return {
+    title: section.name,
+    subcategories: children.map((sub) => ({
+      id: sub.id,
+      name: sub.name,
+      items: items.filter((it) => it.category_id === sub.id).map(menuItemToLegacyCard),
+    })),
   }
 }
 
 function CategoryPage() {
   const { categoryId } = useParams()
   const [data, setData] = useState(null)
-  const [allCategories, setAllCategories] = useState([])
+  /** Розділи верхнього рівня для дропдауну */
+  const [navRoots, setNavRoots] = useState([])
+  const [resolvedSectionId, setResolvedSectionId] = useState(null)
+  const [viewKind, setViewKind] = useState(null)
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
   const [loadError, setLoadError] = useState(null)
@@ -57,19 +85,50 @@ function CategoryPage() {
       }
 
       try {
-        const [categories, items] = await Promise.all([
-          publicApi.getPublicCategories(),
-          publicApi.getPublicMenuItemsByCategory(id, { is_available: true, per_page: 100 }),
+        const [treeRaw, flat] = await Promise.all([
+          publicApi.getPublicCategoryTree().catch(() => []),
+          publicApi.getPublicCategories().catch(() => []),
         ])
-        if (!mounted) return
-        const cat = categories.find((c) => c.id === id)
-        if (!cat) {
+        const tree = Array.isArray(treeRaw) ? treeRaw : []
+
+        let ctx = findCategoryContext(tree, id)
+        if (!ctx && flat.length) {
+          ctx = buildContextFromFlat(flat, id)
+        }
+        if (!ctx) {
           setData(null)
           setLoadError('Категорію не знайдено')
+          setNavRoots([])
+          setResolvedSectionId(null)
+          setViewKind(null)
           return
         }
-        setAllCategories(categories)
-        setData(buildViewModel(cat, items))
+
+        const roots = tree.length > 0 ? sortRoots(tree) : rootsFromFlat(flat)
+        setNavRoots(roots)
+        setResolvedSectionId(ctx.section.id)
+        setViewKind(ctx.kind)
+
+        let items
+        let vm
+        if (ctx.kind === 'section') {
+          items = await publicApi.getPublicMenuItems({
+            parent_category_id: id,
+            is_available: true,
+            per_page: 150,
+          })
+          vm = buildSectionViewModel(ctx.section, items)
+        } else {
+          items = await publicApi.getPublicMenuItems({
+            category_id: id,
+            is_available: true,
+            per_page: 150,
+          })
+          vm = buildViewModel(ctx.sub, items)
+        }
+
+        if (!mounted) return
+        setData(vm)
         hasLoadedOnceRef.current = true
         requestAnimationFrame(() => {
           window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -256,16 +315,25 @@ function CategoryPage() {
 
           {isDropdownOpen ? (
             <div className="dropdown-list">
-              {allCategories
-                .filter((c) => String(c.id) !== String(categoryId))
-                .map((c) => (
+              {viewKind === 'sub' && resolvedSectionId != null ? (
+                <Link
+                  to={`/category/${resolvedSectionId}`}
+                  className="dropdown-option dropdown-option--emphasis"
+                  onClick={() => setIsDropdownOpen(false)}
+                >
+                  Увесь розділ
+                </Link>
+              ) : null}
+              {navRoots
+                .filter((r) => r.id !== resolvedSectionId)
+                .map((r) => (
                   <Link
-                    key={c.id}
-                    to={`/category/${c.id}`}
+                    key={r.id}
+                    to={`/category/${r.id}`}
                     className="dropdown-option"
                     onClick={() => setIsDropdownOpen(false)}
                   >
-                    {c.name}
+                    {r.name}
                   </Link>
                 ))}
             </div>
@@ -276,7 +344,7 @@ function CategoryPage() {
       <div className="subcategory-carousel">
         {data.subcategories.map((sub, index) => (
           <button
-            key={sub.name}
+            key={sub.id}
             type="button"
             className={`carousel-tab ${activeSub === index ? 'active' : ''}`}
             onClick={() => scrollToSection(index)}
@@ -292,7 +360,7 @@ function CategoryPage() {
       >
         {data.subcategories.map((sub, subIndex) => (
           <section
-            key={sub.name}
+            key={sub.id}
             ref={(el) => {
               sectionRefs.current[subIndex] = el
             }}

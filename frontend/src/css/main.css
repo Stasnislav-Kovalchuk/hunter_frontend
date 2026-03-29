@@ -70,3 +70,105 @@ a {
   display: flex; 
   justify-content: center; 
 }
+
+/* ——— Головна: анімації після завантаження ——— */
+.home-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 20px 8px;
+}
+
+.home-loading__pulse {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f4f4f5 0%, #e4e4e7 100%);
+  animation: homeLoadingPulse 1s ease-in-out infinite;
+}
+
+.home-loading__text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #52525b;
+}
+
+@keyframes homeLoadingPulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+}
+
+.home-page--ready .header {
+  animation: homeHeaderReveal 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes homeHeaderReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-menu-item-enter {
+  animation: homeItemPop 0.48s cubic-bezier(0.34, 1.25, 0.64, 1) both;
+  animation-delay: calc(var(--home-i, 0) * 70ms + 90ms);
+}
+
+@keyframes homeItemPop {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.home-about-enter {
+  width: 100%;
+  animation: homeAboutFade 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--home-about-delay, 400ms);
+}
+
+@keyframes homeAboutFade {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.home-empty-enter {
+  animation: homeAboutFade 0.45s ease both;
+  animation-delay: 120ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-page--ready .header,
+  .home-menu-item-enter,
+  .home-about-enter,
+  .home-empty-enter {
+    animation: none !important;
+  }
+
+  .home-loading__pulse {
+    animation: none;
+    opacity: 1;
+  }
+}

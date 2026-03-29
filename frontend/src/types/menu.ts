@@ -2,6 +2,15 @@ export type Category = {
   id: number
   name: string
   description?: string | null
+  /** null — розділ верхнього рівня; число — підкатегорія */
+  parent_id?: number | null
+  is_active?: boolean
+  sort_order?: number
+}
+
+/** Вузол з GET /api/public/category-tree (2 рівні: розділ → children) */
+export type CategoryTreeNode = Category & {
+  children?: CategoryTreeNode[]
 }
 
 export type MenuItem = {
@@ -18,7 +27,7 @@ export type MenuItem = {
   calories_kcal?: number | null
   weight_g?: number | null
   prep_time_minutes?: number | null
-  category_id: number
+  category_id: number | null
   category_name?: string
 }
 

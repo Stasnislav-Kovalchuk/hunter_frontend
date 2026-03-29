@@ -13,11 +13,17 @@ body {
   min-height: 100%;
 }
 
+/* М’який фон за «телефоном» — без різкого сірого плями */
 body {
-  @apply bg-zinc-200;
+  margin: 0;
+  background: radial-gradient(120% 80% at 50% 0%, #ffffff 0%, #f6f6f7 42%, #ececee 100%);
 }
 
 #root {
-  @apply mx-auto w-full max-w-[430px] min-h-dvh bg-zinc-50 text-zinc-900 antialiased shadow-2xl;
+  @apply mx-auto w-full max-w-[430px] min-h-dvh bg-white text-zinc-900 antialiased;
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.06),
+    0 2px 6px rgba(15, 23, 42, 0.04),
+    0 20px 50px -18px rgba(15, 23, 42, 0.18);
 }
 

@@ -1,5 +1,5 @@
 import { api } from '@/services/api'
-import type { Category, MenuItem } from '@/types/menu'
+import type { Category, CategoryTreeNode, MenuItem } from '@/types/menu'
 
 type CollectionResponse<T> =
   | T[]
@@ -33,12 +33,20 @@ export async function getPublicCategories(): Promise<Category[]> {
   return extractCollection(data)
 }
 
+/** Дерево розділів (2 рівні): розділи з полем children — підкатегорії */
+export async function getPublicCategoryTree(): Promise<CategoryTreeNode[]> {
+  const { data } = await api.get<CategoryTreeNode[] | { items: CategoryTreeNode[] }>('/api/public/category-tree')
+  return Array.isArray(data) ? data : data.items
+}
+
 export type MenuItemsQuery = {
   page?: number
   per_page?: number
   q?: string
   is_available?: boolean
   category_id?: number
+  /** Усі товари в піддереві розділу (розділ + підкатегорії) */
+  parent_category_id?: number
 }
 
 export async function getPublicMenuItems(query: MenuItemsQuery = {}): Promise<MenuItem[]> {
@@ -49,9 +57,14 @@ export async function getPublicMenuItems(query: MenuItemsQuery = {}): Promise<Me
   }))
 }
 
+export type MenuItemsByCategoryQuery = Omit<MenuItemsQuery, 'category_id'> & {
+  /** true — лише точний category_id, без нащадків */
+  shallow?: boolean
+}
+
 export async function getPublicMenuItemsByCategory(
   categoryId: number,
-  query: Omit<MenuItemsQuery, 'category_id'> = {},
+  query: MenuItemsByCategoryQuery = {},
 ): Promise<MenuItem[]> {
   const { data } = await api.get<CollectionResponse<MenuItem>>(`/api/public/categories/${categoryId}/menu-items`, {
     params: query,

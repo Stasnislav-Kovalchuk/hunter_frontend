@@ -52,6 +52,20 @@ if (categories.length === 0) {
   process.exit(1)
 }
 
+const sample = categories[0]
+if (!('parent_id' in sample)) {
+  console.warn('У категорії немає поля parent_id — потрібен оновлений бекенд (2 рівні категорій).')
+}
+
+// 1b) Дерево розділів (новий ендпоїнт)
+try {
+  const treeResp = await fetchJson(`${baseArg}/api/public/category-tree`)
+  const tree = ensureArray(treeResp.json, 'GET /api/public/category-tree має повертати JSON-масив')
+  console.log(`--- OK category-tree roots: ${tree.length}`)
+} catch (e) {
+  console.warn('--- SKIP category-tree:', e instanceof Error ? e.message : e)
+}
+
 // 2) Меню (пагінація)
 const menuUrl = `${baseArg}/api/public/menu-items?is_available=true&per_page=20`
 const menuResp = await fetchJson(menuUrl)
@@ -65,23 +79,51 @@ if (menuItems.length === 0) {
   process.exit(1)
 }
 
-// 3) Перевір категорію: /categories/<id>/menu-items
-const categoryId = Number(categories[0]?.id)
-if (!Number.isFinite(categoryId)) throw new Error('У категорії немає коректного id')
+// 3) Розділ: глибокий список (розділ + підкатегорії) — category_id у товарів може бути id листка
+const rootCat = categories.find((c) => c.parent_id == null) ?? categories[0]
+const sectionId = Number(rootCat?.id)
+if (!Number.isFinite(sectionId)) throw new Error('Немає коректного id розділу')
 
-const byCatUrl = `${baseArg}/api/public/categories/${categoryId}/menu-items?is_available=true&per_page=50`
-const byCatResp = await fetchJson(byCatUrl)
-const itemsByCat = byCatResp.json?.items
-if (!Array.isArray(itemsByCat)) throw new Error('GET /api/public/categories/<id>/menu-items має повертати { items: [...] }')
+const deepUrl = `${baseArg}/api/public/categories/${sectionId}/menu-items?is_available=true&per_page=50`
+const deepResp = await fetchJson(deepUrl)
+const deepItems = deepResp.json?.items
+if (!Array.isArray(deepItems)) {
+  throw new Error('GET /api/public/categories/<id>/menu-items має повертати { items: [...] }')
+}
+console.log(`--- OK deep menu-items for section ${sectionId}: ${deepItems.length}`)
 
-console.log(`--- OK items in category ${categoryId}: ${itemsByCat.length}`)
-// Front очікує, що items належать цій категорії; якщо в items є category_id — він має збігатися.
-for (const it of itemsByCat.slice(0, 50)) {
-  if (it?.category_id != null && Number(it.category_id) !== categoryId) {
-    console.error('Несумісність category_id для items у категорії:')
-    console.error({ categoryId, itemId: it?.id, itemCategoryId: it?.category_id })
-    process.exit(1)
+// 3b) Листок: shallow=true — усі товари з точним category_id
+const leafCat = categories.find((c) => c.parent_id != null)
+if (leafCat) {
+  const leafId = Number(leafCat.id)
+  const shallowUrl = `${baseArg}/api/public/categories/${leafId}/menu-items?shallow=true&is_available=true&per_page=50`
+  const shallowResp = await fetchJson(shallowUrl)
+  const shallowItems = shallowResp.json?.items
+  if (!Array.isArray(shallowItems)) throw new Error('shallow menu-items: очікували { items: [...] }')
+  console.log(`--- OK shallow menu-items for leaf ${leafId}: ${shallowItems.length}`)
+  for (const it of shallowItems.slice(0, 50)) {
+    if (it?.category_id != null && Number(it.category_id) !== leafId) {
+      console.error('При shallow=true category_id має збігатися з id листка:', {
+        leafId,
+        itemId: it?.id,
+        itemCategoryId: it?.category_id,
+      })
+      process.exit(1)
+    }
   }
+} else {
+  console.warn('Немає підкатегорій у flat categories — пропуск перевірки shallow.')
+}
+
+// 3c) parent_category_id (меню всього розділу одним запитом)
+try {
+  const parentUrl = `${baseArg}/api/public/menu-items?parent_category_id=${sectionId}&is_available=true&per_page=50`
+  const parentResp = await fetchJson(parentUrl)
+  const parentItems = parentResp.json?.items
+  if (!Array.isArray(parentItems)) throw new Error('expected items[]')
+  console.log(`--- OK menu-items?parent_category_id=${sectionId}: ${parentItems.length}`)
+} catch (e) {
+  console.warn('--- SKIP parent_category_id:', e instanceof Error ? e.message : e)
 }
 
 // 4) Пошук q=... має давати хоч щось

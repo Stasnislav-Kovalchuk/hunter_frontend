@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import type { Category, MenuItem } from '@/types/menu'
+import type { CategoryTreeNode, MenuItem } from '@/types/menu'
 import * as publicApi from '@/services/publicApi'
 import { getErrorMessage } from '@/services/api'
+import { leafCategoryIds, rootsFromFlat, sortRoots } from '@/utils/categoryTree'
 import Spinner from '@/components/ui/Spinner'
 import EmptyState from '@/components/ui/EmptyState'
 
@@ -41,7 +42,8 @@ function ProductCard({ item }: { item: MenuItem }) {
 
 export default function MenuPage() {
   const { restaurantId } = useParams()
-  const [categories, setCategories] = useState<Category[]>([])
+  /** Розділи верхнього рівня (фільтр «Усе» + по розділу) */
+  const [sections, setSections] = useState<CategoryTreeNode[]>([])
   const [items, setItems] = useState<MenuItem[]>([])
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null)
   const [q, setQ] = useState('')
@@ -54,12 +56,14 @@ export default function MenuPage() {
       setIsLoading(true)
       setError(null)
       try {
-        const [cats, menuItems] = await Promise.all([
-          publicApi.getPublicCategories(),
-          publicApi.getPublicMenuItems({ is_available: true }),
+        const [tree, flat, menuItems] = await Promise.all([
+          publicApi.getPublicCategoryTree().catch(() => []),
+          publicApi.getPublicCategories().catch(() => []),
+          publicApi.getPublicMenuItems({ is_available: true, per_page: 200 }),
         ])
         if (!mounted) return
-        setCategories(cats)
+        const roots = tree.length > 0 ? sortRoots(tree) : rootsFromFlat(flat)
+        setSections(roots)
         setItems(menuItems)
       } catch (e) {
         if (!mounted) return
@@ -76,14 +80,23 @@ export default function MenuPage() {
 
   const filtered = useMemo(() => {
     const query = q.trim().toLowerCase()
+    const section =
+      activeCategoryId != null ? sections.find((s) => s.id === activeCategoryId) : undefined
+
     return items.filter((it) => {
       if (!it.is_available) return false
-      if (activeCategoryId && it.category_id !== activeCategoryId) return false
+      if (activeCategoryId != null) {
+        if (!section) return false
+        const leaves = leafCategoryIds(section)
+        if (leaves.length === 0) return false
+        const allowed = new Set(leaves)
+        if (it.category_id == null || !allowed.has(it.category_id)) return false
+      }
       if (!query) return true
       const hay = `${it.name} ${it.description ?? ''}`.toLowerCase()
       return hay.includes(query)
     })
-  }, [items, activeCategoryId, q])
+  }, [items, activeCategoryId, q, sections])
 
   if (isLoading) {
     return (
@@ -140,9 +153,10 @@ export default function MenuPage() {
         >
           Усе
         </button>
-        {categories.map((c) => (
+        {sections.map((c) => (
           <button
             key={c.id}
+            type="button"
             onClick={() => setActiveCategoryId(c.id)}
             className={[
               'shrink-0 rounded-full px-4 py-2 text-sm font-medium ring-1 transition',
