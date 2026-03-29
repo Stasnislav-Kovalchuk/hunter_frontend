@@ -168,18 +168,18 @@
 
 /* Горизонтальний скрол усіх підкатегорій (свайп / колесо з Shift / тонкий скролбар) */
 .subcategory-carousel {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
-  scroll-snap-type: x proximity;
-  gap: 10px;
-  padding: 10px 15px 16px 50px;
-  margin: 0px 0px 0px 20px;
-  background: #fff;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(15, 23, 42, .2) transparent;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    gap: 10px;
+    padding: 10px 15px 16px 50px;
+    margin: 0;
+    background: #fff;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 23, 42, .2) transparent;
 }
 
 .subcategory-carousel::-webkit-scrollbar {
