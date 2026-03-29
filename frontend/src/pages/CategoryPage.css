@@ -34,6 +34,7 @@
   justify-content: center;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  display: none;
 }
 
 
@@ -50,7 +51,7 @@
 .custom-dropdown {
   width: 85%;
   position: relative;
-  filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+  filter: drop-shadow(0px 2px 9px gray);
 }
 
 /* Верхня частина (кнопка) */
@@ -73,6 +74,7 @@
   
   /* Початковий стан — овал */
   border-radius: 50px;
+  
 }
 
 /* Коли відкрито — "з'єднуємо" з низом через зміну радіусів */
@@ -170,7 +172,7 @@
 
 .subcategory-section {
   scroll-margin-top: 80px;
-  padding: 10px 20px;
+  padding: 20px 20px;
 }
 
 .section-title {
