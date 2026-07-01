@@ -27,7 +27,7 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       host: true,
-      allowedHosts: ['.up.railway.app', 'localhost', '127.0.0.1'],
+      allowedHosts: ['.up.railway.app', 'localhost', '127.0.0.1', '.menu-hunter.shop'],
     },
   }
 })
